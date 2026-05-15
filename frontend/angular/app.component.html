@@ -1,0 +1,62 @@
+<main class="shell">
+  <aside class="sidebar">
+    <h1>Quiz DBMS</h1>
+    <button *ngFor="let item of nav" [class.active]="active === item" (click)="active = item">
+      {{ item | titlecase }}
+    </button>
+  </aside>
+
+  <section class="workspace">
+    <header class="topbar">
+      <div>
+        <p>Educational assessment platform</p>
+        <h2>{{ active | titlecase }}</h2>
+      </div>
+      <button (click)="loadAll()">Refresh</button>
+    </header>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <p class="loading" *ngIf="loading">Loading PostgreSQL data...</p>
+
+    <section class="metrics" *ngIf="!loading && active === 'dashboard'">
+      <article><span>Users</span><strong>{{ data.dashboard.users || 0 }}</strong></article>
+      <article><span>Quizzes</span><strong>{{ data.dashboard.quizzes || 0 }}</strong></article>
+      <article><span>Attempts</span><strong>{{ data.dashboard.results || 0 }}</strong></article>
+      <article><span>Average</span><strong>{{ data.dashboard.averageScore || 0 }}</strong></article>
+    </section>
+
+    <section class="grid" *ngIf="!loading && active === 'quizzes'">
+      <article class="card" *ngFor="let quiz of data.quizzes">
+        <h3>{{ quiz.title }}</h3>
+        <p>{{ quiz.description }}</p>
+        <span>{{ quiz.status }}</span>
+      </article>
+    </section>
+
+    <table *ngIf="!loading && active === 'users'">
+      <tr><th>Name</th><th>Email</th><th>Role</th></tr>
+      <tr *ngFor="let user of data.users"><td>{{ user.name }}</td><td>{{ user.email }}</td><td>{{ user.role }}</td></tr>
+    </table>
+
+    <table *ngIf="!loading && active === 'results'">
+      <tr><th>Student</th><th>Quiz</th><th>Score</th><th>Level</th></tr>
+      <tr *ngFor="let result of data.results">
+        <td>{{ result.student_name }}</td><td>{{ result.quiz_title }}</td><td>{{ result.score }}</td><td>{{ result.performance_level }}</td>
+      </tr>
+    </table>
+
+    <table *ngIf="!loading && active === 'learning'">
+      <tr><th>Student</th><th>Quiz</th><th>Status</th><th>Due</th></tr>
+      <tr *ngFor="let enrollment of data.enrollments">
+        <td>{{ enrollment.student_name }}</td><td>{{ enrollment.quiz_title }}</td><td>{{ enrollment.status }}</td><td>{{ enrollment.due_at | date:'short' }}</td>
+      </tr>
+    </table>
+
+    <table *ngIf="!loading && active === 'audit'">
+      <tr><th>Operation</th><th>Table</th><th>Record</th><th>Changed</th></tr>
+      <tr *ngFor="let row of data.audit">
+        <td>{{ row.operation_type }}</td><td>{{ row.table_name }}</td><td>{{ row.record_id }}</td><td>{{ row.changed_at | date:'short' }}</td>
+      </tr>
+    </table>
+  </section>
+</main>

@@ -1,0 +1,35 @@
+{
+  "name": "dbms-quiz-app",
+  "version": "1.0.0",
+  "description": "Educational project for working with PostgreSQL Quiz System",
+  "main": "server.js",
+  "scripts": {
+    "build": "vite build",
+    "client:dev": "vite --host 0.0.0.0",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "postgresql",
+    "quiz"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "lucide-react": "^1.16.0",
+    "pg": "^8.10.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "vite": "^8.0.13"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quizzes - Quiz System</title>
+  <script src="/js/theme.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Quiz Management System</h1>
+      <nav>
+        <a href="/">Dashboard</a>
+        <a href="/users.html">Users</a>
+        <a href="/quizzes.html" class="active">Quizzes</a>
+        <a href="/results.html">Results</a>
+        <a href="/audit.html">Audit Log</a>
+        <button class="theme-toggle" id="theme-toggle" type="button">Dark</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h2 class="page-title">Quizzes Management</h2>
+      <p class="page-subtitle">Manage quiz metadata and inspect related questions and answers.</p>
+      
+      <div class="actions">
+        <button class="btn-primary" onclick="openAddQuizModal()">Add Quiz</button>
+        <button class="btn-secondary" onclick="loadQuizzes()">Refresh</button>
+      </div>
+
+      <div id="notification-container"></div>
+      <div id="quizzes-table"></div>
+    </div>
+  </main>
+
+    <div id="quizModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="quizModalTitle">Add New Quiz</h2>
+        <button class="close-btn" id="quiz-close-btn" onclick="closeModal('quizModal')">&times;</button>
+      </div>
+      <form id="quiz-form">
+        <div class="form-group">
+          <label for="quiz-title">Title</label>
+          <input type="text" id="quiz-title" name="title" required>
+        </div>
+        <div class="form-group">
+          <label for="quiz-status">Status</label>
+          <select id="quiz-status" name="status">
+            <option value="draft">draft</option>
+            <option value="published">published</option>
+            <option value="closed">closed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quiz-created-by">Created By User ID</label>
+          <input type="number" id="quiz-created-by" name="created_by" placeholder="Enter existing user_id" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal('quizModal')">Cancel</button>
+          <button type="submit" class="btn-primary">Save Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/quizzes.js"></script>
+</body>
+</html>

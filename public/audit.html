@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Log - Quiz System</title>
+  <script src="/js/theme.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Quiz Management System</h1>
+      <nav>
+        <a href="/">Dashboard</a>
+        <a href="/users.html">Users</a>
+        <a href="/quizzes.html">Quizzes</a>
+        <a href="/results.html">Results</a>
+        <a href="/audit.html" class="active">Audit Log</a>
+        <button class="theme-toggle" id="theme-toggle" type="button">Dark</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h2 class="page-title">Audit Log</h2>
+      <p class="page-subtitle">Trigger-based history of insert, update, and delete operations.</p>
+      
+      <div class="actions">
+        <button class="btn-secondary" onclick="loadAuditLog()">Refresh</button>
+      </div>
+
+      <div id="notification-container"></div>
+      <div id="audit-table"></div>
+    </div>
+  </main>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/audit.js"></script>
+</body>
+</html>
