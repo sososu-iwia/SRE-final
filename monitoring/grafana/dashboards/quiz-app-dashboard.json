@@ -1,0 +1,271 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "type": "datasource",
+      "pluginId": "prometheus"
+    }
+  ],
+  "title": "Quiz App — SRE Dashboard",
+  "uid": "quiz-app-sre",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-3h", "to": "now" },
+  "tags": ["quiz-app", "sre", "slo"],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Availability (SLI) — 1h",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red",    "value": null },
+              { "color": "yellow", "value": 0.99 },
+              { "color": "green",  "value": 0.995 }
+            ]
+          },
+          "mappings": []
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "job:http_request_success_rate:1h",
+          "legendFormat": "Availability"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "p95 Latency (ms) — 5m",
+      "type": "stat",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 300 },
+              { "color": "red",    "value": 500 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "job:http_request_duration_p95:5m * 1000",
+          "legendFormat": "p95 latency"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Error Rate — 5m",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 0.01 },
+              { "color": "red",    "value": 0.05 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "1 - job:http_request_success_rate:5m",
+          "legendFormat": "Error rate"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Pod Replicas",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red",   "value": null },
+              { "color": "green", "value": 2 }
+            ]
+          }
+        }
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "kube_deployment_status_available_replicas{namespace=\"quiz-app\",deployment=\"quiz-app\"}",
+          "legendFormat": "Available"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "HTTP Request Rate (req/s)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" }
+      },
+      "options": { "tooltip": { "mode": "multi" } },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "sum(rate(http_requests_total{job=\"quiz-app\"}[1m])) by (status)",
+          "legendFormat": "HTTP {{ status }}"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Latency Percentiles (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "ms" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "job:http_request_duration_p50:5m * 1000",
+          "legendFormat": "p50"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "job:http_request_duration_p95:5m * 1000",
+          "legendFormat": "p95"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "job:http_request_duration_p99:5m * 1000",
+          "legendFormat": "p99"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Pod CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "percent" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "rate(container_cpu_usage_seconds_total{namespace=\"quiz-app\",container=\"quiz-app\"}[5m]) * 100",
+          "legendFormat": "{{ pod }}"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "title": "Pod Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "container_memory_working_set_bytes{namespace=\"quiz-app\",container=\"quiz-app\"}",
+          "legendFormat": "{{ pod }}"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "title": "HPA — Current vs Max Replicas",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"quiz-app\"}",
+          "legendFormat": "Current replicas"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"quiz-app\"}",
+          "legendFormat": "Max replicas"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "kube_horizontalpodautoscaler_spec_min_replicas{namespace=\"quiz-app\"}",
+          "legendFormat": "Min replicas"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "title": "PostgreSQL Active Connections",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 20, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "pg_stat_database_numbackends{datname=\"dbms2\"}",
+          "legendFormat": "Active connections"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "pg_settings_max_connections",
+          "legendFormat": "Max connections"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "title": "30-Day Error Budget Remaining",
+      "type": "gauge",
+      "gridPos": { "x": 0, "y": 28, "w": 8, "h": 6 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red",    "value": null },
+              { "color": "yellow", "value": 0.25 },
+              { "color": "green",  "value": 0.50 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "expr": "clamp_min(1 - ((1 - job:http_request_success_rate:24h) / 0.005), 0)",
+          "legendFormat": "Error budget remaining"
+        }
+      ]
+    }
+  ]
+}

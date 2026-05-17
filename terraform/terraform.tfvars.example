@@ -1,0 +1,5 @@
+project_name = "quiz-app"
+db_name      = "dbms2"
+db_username  = "postgres"
+db_password  = "postgres"
+app_port     = 1112

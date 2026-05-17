@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quiz-app
+  namespace: quiz-app
+  labels:
+    app: quiz-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quiz-app
+  template:
+    metadata:
+      labels:
+        app: quiz-app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "1112"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: quiz-app
+          image: quiz-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 1112
+          env:
+            - name: PORT
+              value: "1112"
+            - name: DB_HOST
+              value: "quiz-postgres"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "dbms2"
+            - name: DB_USER
+              value: "postgres"
+            - name: DB_PASSWORD
+              value: "postgres"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 1112
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 1112
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3

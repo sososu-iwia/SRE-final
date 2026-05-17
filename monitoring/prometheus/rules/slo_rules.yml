@@ -1,0 +1,65 @@
+groups:
+  # ── Availability SLO ──────────────────────────────────────────────────────
+  - name: quiz_app_availability
+    interval: 30s
+    rules:
+      # Ratio of successful requests (2xx + 3xx) over 5-minute window
+      - record: job:http_request_success_rate:5m
+        expr: |
+          sum(rate(http_requests_total{job="quiz-app",status=~"2..|3.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="quiz-app"}[5m]))
+
+      # 1-hour availability
+      - record: job:http_request_success_rate:1h
+        expr: |
+          sum(rate(http_requests_total{job="quiz-app",status=~"2..|3.."}[1h]))
+          /
+          sum(rate(http_requests_total{job="quiz-app"}[1h]))
+
+      # 24-hour availability
+      - record: job:http_request_success_rate:24h
+        expr: |
+          sum(rate(http_requests_total{job="quiz-app",status=~"2..|3.."}[24h]))
+          /
+          sum(rate(http_requests_total{job="quiz-app"}[24h]))
+
+  # ── Latency SLO ───────────────────────────────────────────────────────────
+  - name: quiz_app_latency
+    interval: 30s
+    rules:
+      # p50 latency (5-minute window)
+      - record: job:http_request_duration_p50:5m
+        expr: |
+          histogram_quantile(0.50,
+            sum(rate(http_request_duration_seconds_bucket{job="quiz-app"}[5m])) by (le)
+          )
+
+      # p95 latency (5-minute window)
+      - record: job:http_request_duration_p95:5m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{job="quiz-app"}[5m])) by (le)
+          )
+
+      # p99 latency (5-minute window)
+      - record: job:http_request_duration_p99:5m
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket{job="quiz-app"}[5m])) by (le)
+          )
+
+  # ── Error Budget burn-rate ────────────────────────────────────────────────
+  - name: quiz_app_error_budget
+    rules:
+      # SLO target: 99.5% availability
+      # Error budget = 1 - 0.995 = 0.005
+      # Fast burn: consuming 2% of 30-day budget in 1h  (factor 14.4x)
+      - record: job:error_budget_burn_rate:1h
+        expr: |
+          1 - job:http_request_success_rate:1h
+
+      # Slow burn over 6h (factor 6x)
+      - record: job:error_budget_burn_rate:6h
+        expr: |
+          1 - avg_over_time(job:http_request_success_rate:1h[6h])

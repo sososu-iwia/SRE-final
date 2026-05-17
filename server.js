@@ -2,11 +2,14 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const { metricsMiddleware, metricsHandler } = require('./middleware/metrics');
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+app.use(metricsMiddleware);
 
 const usersRoutes = require('./routes/users.routes');
 const quizzesRoutes = require('./routes/quizzes.routes');
@@ -39,6 +42,8 @@ app.get('/api/student-results', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK' });
 });
+
+app.get('/metrics', metricsHandler);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });

@@ -3,3 +3,21 @@ node_modules/
 .DS_Store
 *.log
 npm-debug.log*
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+*.tfvars
+!*.tfvars.example
+
+# Locust reports
+locust/report.html
+locust/*.html
+
+# Grafana / Prometheus local data
+monitoring/grafana/data/
+monitoring/prometheus/data/
+
